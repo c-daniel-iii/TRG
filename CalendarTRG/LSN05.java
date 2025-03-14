@@ -1,4 +1,3 @@
-
 /*
  * LSN05:
 	>> Input: Year, YearSpan
