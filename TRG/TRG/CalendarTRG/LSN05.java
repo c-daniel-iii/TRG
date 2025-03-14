@@ -1,3 +1,4 @@
+
 /*
  * LSN05:
 	>> Input: Year, YearSpan
@@ -23,34 +24,20 @@ public class LSN05 {
     public static void main(String[] args) {
         initialize();
         run();
-        while (reRun() == true) {
-            run();
-        }
-        System.out.println("Application terminating...");
-        System.exit(0);
     }// Main method
-
-    private static boolean reRun(){
-        System.out.print("\nDo you want to re-run the Application again [Y/N]?");
-        String input = String.valueOf(scan.nextLine().charAt(0));
-        if(input.equalsIgnoreCase("Y"))
-            return true;
-        else if(input.equalsIgnoreCase("N"))
-            return false;
-        else {
-            System.out.print("\n>>Invalid input!!!");
-            return reRun();
-        }
-    }//Asks the user if the program should be executed again.
 
     private static void run() {
         int year, span;
-        year = getYear();
-        span = getSpanYear();
+        // year = getYear();
+        // span = getSpanYear();
+        year = 2025;
+        span = 2;
+
         initDayPointerMap(year, span);
 
         System.out.println("");
         showCalendar(year, span);
+        // getPrintedDaysPerWeek(1,31,1, year);
     }// Run the Application
 
     private static String getPrintedDaysPerWeek(int curr_day, int max_days, int dateIndex, int curr_year) {
@@ -62,6 +49,9 @@ public class LSN05 {
             days_per_week += curr_dayStr.concat("\t");
 
             if (dateIndex == Calendar.SATURDAY) {
+                // int next_day = (curr_day + 1) > max_days ? 1 : (curr_day + 1);
+                // setDayPointerMap(curr_year, next_day);
+
                 int temp_day = curr_day <= max_days ? curr_day : 0;
                 setDayPointerMap(curr_year, temp_day);
                 break;
@@ -91,11 +81,15 @@ public class LSN05 {
                 System.out.print("\n");
             }
 
-            int nWeeksMax = getMaxNumOfWeeks(year, span, monthIndex);
-            int nWeekCurrMax;   // = getMaxNumOfWeeks(year, monthIndex); ;
+            int nWeeksMax = getMaxNumOfWeeks(year, span, monthIndex); // This calculates the highest week count of the
+                                                                      // MONTH[Jan to Dec] for the entire year range
+                                                                      // [year to (year + n -1)]
+
             for (int curr_year = year; curr_year < (year + span); curr_year++) {
+                // System.out.print("> " + getMaxNumOfWeeks(curr_year, monthIndex) + ", " +
+                // getMaxDay(curr_year, monthIndex) + "\t");
+                // int nWeekCurr = getMaxNumOfWeeks(curr_year, monthIndex);
                 doDisplay = false;
-                nWeekCurrMax = getMaxNumOfWeeks(curr_year, monthIndex);
                 int max_days = getMaxDay(curr_year, monthIndex);
                 isLastYear = curr_year == (year + span - 1);
 
@@ -105,30 +99,33 @@ public class LSN05 {
                     dateIndex = Calendar.SUNDAY;
                 }
 
+                String test = day_pointerMap.toString() + " Key: " + curr_year;
                 int curr_day = day_pointerMap.get(curr_year) + 1;
                 String daysNum = getPrintedDaysPerWeek(curr_day, max_days, dateIndex, curr_year);
 
+                int fetchDay = day_pointerMap.get(curr_year);
                 int lastDayIndex = getLastDayOfWeek(curr_year, monthIndex);
 
-                if (nWeek == 1) {
-                    daysNum = padding(dateIndex, false).concat(daysNum);
+                if (nWeek == 1){
+                    padding(dateIndex, false);
                     System.out.print(daysNum);
-                } else if (nWeekCurrMax < nWeeksMax && nWeek >= nWeekCurrMax && curr_day >= max_days) {
-                    System.out.print(padding());
-                } else if (nWeek == nWeekCurrMax) { 
-                    daysNum = daysNum.concat(padding(lastDayIndex, true));
+                } else if (nWeek == nWeeksMax){  // Check if Last Line and last day of the month
                     System.out.print(daysNum);
-                } else if (nWeek >= nWeekCurrMax){
-                    System.out.print(padding());
-                }else {
+                    padding(lastDayIndex, true);
+                } else {
                     System.out.print(daysNum);
                 }
                     
-
+                // if (nWeek != nWeeksMax && fetchDay == max_days){
+                //     padding();
+                // } 
+                
+                
                 // Increment nWeek (Line) only when end of year to (year+span) LOOP
                 // ADD Page Break
                 // nWeek = curr_year == (year + span - 1) ? nWeek + 1 : nWeek;
                 if (isLastYear) {
+                    System.out.print("\t" + day_pointerMap.toString() + " nWeek: " + nWeek + "/ " + nWeeksMax);
                     System.out.print("\n"); // line break ath the end
                 }
 
@@ -141,25 +138,29 @@ public class LSN05 {
                 } else {
                     nWeek = isLastYear ? nWeek + 1 : nWeek;
                 }
+                // System.out.print(nWeek + "_nWeek");
             } // for loop
         } // while loop
 
     }// Displays the calendar
 
-    private static String padding() {
-        String padding = " ".repeat(3).concat("\t");
-        int repCount = Calendar.SATURDAY;
-        return padding.repeat(repCount);
+    private static void padding() {
+        String padding = "p".repeat(3).concat("\t");
+        int repCount = Calendar.SATURDAY - Calendar.SUNDAY;
+        System.out.print(padding.repeat(repCount));
     }// Padding lines that has no days on the current week
 
-    private static String padding(int dateIndex, boolean isLast) {
-        String padding = " ".repeat(3).concat("\t");
+    private static void padding(int dateIndex, boolean isLast) {
+        String padding = "-".repeat(3).concat("\t");
         int repCount = dateIndex - Calendar.SUNDAY;
         if (isLast) {
             repCount = Calendar.SATURDAY - dateIndex;
         }
 
-        return padding.repeat(repCount);
+        System.out.print(padding.repeat(repCount));
+        // for (int day = Calendar.SUNDAY; day < dateIndex; day++) {
+        // System.out.print(padding);
+        // }
     }// Creates padding on end or beginning
 
     private static int getFirstDayOfWeek(int year, int monthIndex) {
@@ -178,6 +179,10 @@ public class LSN05 {
         calendar = new GregorianCalendar(year, monthIndex, 1);
         return calendar.getActualMaximum(Calendar.WEEK_OF_MONTH);
     }// Get line count (max week count)
+
+    // private static int getMaxNumOfWeeks(int year, int span, int monthIndex) {
+
+    // }//Get current nWeek
 
     private static int getMaxNumOfWeeks(int year, int span, int monthIndex) {
         int maxNumOfWeeks = 0;
@@ -218,10 +223,8 @@ public class LSN05 {
             return null;
         } else {
             String curr_month = MONTHS.get(monthIndex);
-            // System.out.print(curr_month.concat(getFillerSpaces(curr_month) + tab));
-            String monthNamePerLine = curr_month.concat(getFillerSpaces(curr_month) + tab);
-            // return curr_month.concat(getFillerSpaces(curr_month) + tab);
-            return monthNamePerLine.repeat(span);
+            System.out.print(curr_month.concat(getFillerSpaces(curr_month) + tab));
+            return curr_month.concat(getFillerSpaces(curr_month) + tab);
         }
     }// Return the whole line of the month header xn [where n: span]
 
@@ -230,11 +233,13 @@ public class LSN05 {
     }// Filler spaces for MONTH/ YEAR
 
     private static void showYearHeader(int year, int span) {
+        // String weekdays_spaces = "0".repeat(21).concat("\t".repeat(21));
         for (int curr_year = year; curr_year < (year + span); curr_year++) {
             if (curr_year > 9999)
                 break;
             System.out.print(curr_year + getFillerSpaces(String.format("%04d", curr_year)) + tab);
         } // Year Iteration up to range
+          // System.out.println(weekdays_spaces);
     }// Display year header
 
     private static int getYear() {
@@ -315,4 +320,79 @@ public class LSN05 {
         day_pointerMap.put(key, value);
         // System.out.print(day_pointerMap.toString());
     }
+
+    /**
+     * private static void showCalendar(int year, int span){
+     * System.out.println("");
+     * showYearHeader(year, span);
+     * 
+     * for(int monthIndex = Calendar.JANUARY; monthIndex < MONTHS.size();
+     * monthIndex++){
+     * System.out.print("\n");
+     * showMonthHeader(year, span, monthIndex);
+     * 
+     * System.out.print("\n");
+     * showDayDetails(year, span, monthIndex);
+     * }//Iterates months
+     * }//Displays the calendar output
+     * 
+     * private static void showDayDetails(int year, int span, int monthIndex){
+     * for(int curr_year = year; curr_year < (year + span); curr_year++) {
+     * if(curr_year > 9999)
+     * break;
+     * 
+     * int dayOfMonth = 1;
+     * calendar = new GregorianCalendar(year, monthIndex, dayOfMonth);
+     * int first_day_of_week = calendar.get(Calendar.DAY_OF_WEEK);
+     * int max_days = calendar.getActualMaximum(Calendar.DATE);
+     * setPadding(first_day_of_week); System.out.print("x");
+     * // for(int day = dayOfMonth; day <= max_days; day++){
+     * 
+     * // }
+     * }
+     * }//Displays days[1~ 28/30/31]
+     * 
+     * private static void setPadding(int first_day_of_week){
+     * String padding = " ".repeat(3);
+     * int day_index = Calendar.SUNDAY;
+     * 
+     * while(day_index < DAYS_OF_WEEK.size()){
+     * if(day_index == first_day_of_week) break;
+     * System.out.print(padding + "\t");
+     * day_index++;
+     * }
+     * }
+     * 
+     * 
+     * private static void showMonthHeader(int year, int span, int monthIndex){
+     * for(int curr_year = year; curr_year < (year + span); curr_year++){
+     * if(curr_year > 9999)
+     * break;
+     * 
+     * String curr_month = MONTHS.get(monthIndex);
+     * int fillerSpaces = daysOfWeekCnt - curr_month.length();
+     * // System.out.print( (daysOfWeekCnt - curr_month.length()));
+     * System.out.print(curr_month + getFillerSpaces(fillerSpaces) + tab);
+     * }
+     * 
+     * System.out.print("\n");
+     * showDaysHeader(year, span);
+     * 
+     * }//Display month header
+     * 
+     * private static void showDaysHeader(int year, int span){
+     * for(int curr_year = year; curr_year < (year + span); curr_year++){
+     * if(curr_year > 9999)
+     * break;
+     * 
+     * for(String day: DAYS_OF_WEEK){
+     * if(day.isEmpty() || day == null)
+     * continue;
+     * 
+     * System.out.print(day + "\t");
+     * }
+     * }
+     * }//Display days header
+     * 
+     */
 }// End of class
