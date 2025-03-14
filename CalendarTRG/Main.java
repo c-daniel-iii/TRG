@@ -15,6 +15,8 @@ public class Main {
     private static int [] currDayofMonth;
     public static void main(String [] args){
         init();
+        String padding = " ".repeat(0);
+        System.out.println("+" + padding + "+");
         // getDayOfTheWeek(2025, Calendar.MARCH, 2);
         // getDaysPerWeek(2024, Calendar.MARCH, 31);
         getLastDayOfWeek(2025, Calendar.MARCH);
